@@ -25,6 +25,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.flywaydb:flyway-core:9.14.1")
+	implementation("org.postgresql:postgresql:42.5.1")
 }
 
 tasks.withType<KotlinCompile> {
