@@ -21,12 +21,15 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("org.flywaydb:flyway-core:9.14.1")
 	implementation("org.postgresql:postgresql:42.5.1")
+	implementation("javax.validation:validation-api:2.0.1.Final")
+
 }
 
 tasks.withType<KotlinCompile> {

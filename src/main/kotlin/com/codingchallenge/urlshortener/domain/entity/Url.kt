@@ -1,4 +1,4 @@
-package com.codingchallenge.urlshortener.domain
+package com.codingchallenge.urlshortener.domain.entity
 
 import java.time.ZonedDateTime
 import javax.persistence.*

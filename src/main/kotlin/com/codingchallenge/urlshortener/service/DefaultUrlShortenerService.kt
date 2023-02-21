@@ -1,6 +1,6 @@
 package com.codingchallenge.urlshortener.service
 
-import com.codingchallenge.urlshortener.domain.Url
+import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadOriginalUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadShortUrlDto
@@ -8,7 +8,8 @@ import com.codingchallenge.urlshortener.repository.UrlRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
+import javax.persistence.EntityNotFoundException
 
 /**
  * UrlShortenerService is interface for one or more implementations of feature
@@ -16,7 +17,7 @@ import java.util.UUID
  * @author Aidar Aibekov
  */
 interface UrlShortenerService {
-    fun shorten(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto
+    fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto
     fun getOriginalUrl(urlKey: String): ReadOriginalUrlDto
 }
 
@@ -28,7 +29,7 @@ interface UrlShortenerService {
 @Service
 class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortenerService {
     @Transactional
-    override fun shorten(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
+    override fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
         val url = Url(
             originalUrl = createShortUrlDto.url,
             urlKey = UUID.randomUUID().toString(),
@@ -41,7 +42,10 @@ class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortene
     }
 
     override fun getOriginalUrl(urlKey: String): ReadOriginalUrlDto {
-        TODO("Not yet implemented")
+        val url = urlRepository.findByUrlKey(urlKey)
+            ?: throw EntityNotFoundException("URL Entity with urlKey $urlKey is not found!")
+
+        return ReadOriginalUrlDto(url.originalUrl)
     }
 
 }
