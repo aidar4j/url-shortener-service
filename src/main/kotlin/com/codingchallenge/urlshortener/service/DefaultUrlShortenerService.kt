@@ -28,6 +28,7 @@ interface UrlShortenerService {
  */
 @Service
 class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortenerService {
+
     @Transactional
     override fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
         val url = Url(
@@ -41,6 +42,7 @@ class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortene
         return ReadShortUrlDto(urlKey = savedUrl.urlKey)
     }
 
+    @Transactional(readOnly = true)
     override fun getOriginalUrl(urlKey: String): ReadOriginalUrlDto {
         val url = urlRepository.findByUrlKey(urlKey)
             ?: throw EntityNotFoundException("URL Entity with urlKey $urlKey is not found!")
