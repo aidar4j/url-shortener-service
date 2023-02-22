@@ -1,8 +1,9 @@
-package com.codingchallenge.urlshortener.service
+package com.codingchallenge.urlshortener.unit.service
 
 import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
 import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.repository.UrlRepository
+import com.codingchallenge.urlshortener.service.DefaultUrlShortenerService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
