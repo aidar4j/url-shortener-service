@@ -5,7 +5,8 @@ import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadOriginalUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadShortUrlDto
 import com.codingchallenge.urlshortener.service.DefaultUrlShortenerService
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -27,15 +28,16 @@ class UrlShortenerControllerTest {
         val createShortUrlDto = CreateShortUrlDto(url = "some long url")
 
         val readShortUrlDto = ReadShortUrlDto(
-            urlKey = UUID.randomUUID().toString()
+            urlKey = "someGeneratedUrlKey"
         )
 
         `when`(defaultUrlShortenerService.shortenUrl(createShortUrlDto)).thenReturn(readShortUrlDto)
 
         val result = urlShortenerController.shortenUrl(createShortUrlDto)
         verify(defaultUrlShortenerService, times(1)).shortenUrl(createShortUrlDto)
-        Assertions.assertNotNull(result)
-        Assertions.assertNotNull(result.urlKey)
+        assertNotNull(result)
+        assertNotNull(result.urlKey)
+        assertEquals(result.urlKey, readShortUrlDto.urlKey)
     }
 
     @Test
@@ -48,8 +50,8 @@ class UrlShortenerControllerTest {
 
         val result = urlShortenerController.getOriginalUrl(urlKey)
         verify(defaultUrlShortenerService, times(1)).getOriginalUrl(urlKey)
-        Assertions.assertNotNull(result)
-        Assertions.assertNotNull(result.originalUrl)
-        Assertions.assertEquals(result.originalUrl, readOriginalUrlDto.originalUrl)
+        assertNotNull(result)
+        assertNotNull(result.originalUrl)
+        assertEquals(result.originalUrl, readOriginalUrlDto.originalUrl)
     }
 }

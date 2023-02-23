@@ -1,14 +1,13 @@
 package com.codingchallenge.urlshortener.service
 
-import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadOriginalUrlDto
 import com.codingchallenge.urlshortener.domain.dto.ReadShortUrlDto
+import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.repository.UrlRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
-import java.util.*
 import javax.persistence.EntityNotFoundException
 
 /**
@@ -31,15 +30,21 @@ class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortene
 
     @Transactional
     override fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
-        val url = Url(
-            originalUrl = createShortUrlDto.url,
-            urlKey = UUID.randomUUID().toString(),
-            createdAt = ZonedDateTime.now()
-        )
+        val existingUrlEntity: Url? = urlRepository.findByOriginalUrl(createShortUrlDto.url)
 
-        val savedUrl = urlRepository.save(url)
+        val savedUrlEntity: Url = if (existingUrlEntity == null) {
+            val url = Url(
+                originalUrl = createShortUrlDto.url,
+                urlKey = generateUrlKey(),
+                createdAt = ZonedDateTime.now()
+            )
 
-        return ReadShortUrlDto(urlKey = savedUrl.urlKey)
+            urlRepository.save(url)
+        } else {
+            existingUrlEntity
+        }
+
+        return ReadShortUrlDto(urlKey = savedUrlEntity.urlKey)
     }
 
     @Transactional(readOnly = true)
@@ -48,6 +53,14 @@ class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortene
             ?: throw EntityNotFoundException("URL Entity with urlKey $urlKey is not found!")
 
         return ReadOriginalUrlDto(url.originalUrl)
+    }
+
+    private fun generateUrlKey(): String {
+        val chars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+
+        return (1..8)
+            .map { chars.random() }
+            .joinToString("")
     }
 
 }

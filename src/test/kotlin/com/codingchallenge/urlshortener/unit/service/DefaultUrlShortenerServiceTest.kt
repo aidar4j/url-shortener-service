@@ -33,16 +33,39 @@ class DefaultUrlShortenerServiceTest {
         val url = Url(
             id = 1L,
             originalUrl = createShortUrldto.url,
+            urlKey = "someGeneratedUrlKey",
+            createdAt = ZonedDateTime.now()
+        )
+
+        `when`(urlRepository.findByOriginalUrl(createShortUrldto.url)).thenReturn(null)
+        `when`(urlRepository.save(any())).thenReturn(url)
+
+        val result = defaultUrlShortenerService.shortenUrl(createShortUrldto)
+        verify(urlRepository, times(1)).findByOriginalUrl(createShortUrldto.url)
+        verify(urlRepository, times(1)).save(any())
+        assertNotNull(result)
+        assertNotNull(result.urlKey)
+        assertEquals(result.urlKey, url.urlKey)
+    }
+
+    @Test
+    fun shortenUrl_withValidDtoWithExistingUrl_shouldReturnReadShortUrlDto() {
+        val createShortUrldto = CreateShortUrlDto(url = "some long url")
+
+        val url = Url(
+            id = 1L,
+            originalUrl = createShortUrldto.url,
             urlKey = UUID.randomUUID().toString(),
             createdAt = ZonedDateTime.now()
         )
 
-        `when`(urlRepository.save(any())).thenReturn(url)
+        `when`(urlRepository.findByOriginalUrl(createShortUrldto.url)).thenReturn(url)
 
         val result = defaultUrlShortenerService.shortenUrl(createShortUrldto)
-        verify(urlRepository, times(1)).save(any())
+        verify(urlRepository, times(1)).findByOriginalUrl(createShortUrldto.url)
         assertNotNull(result)
         assertNotNull(result.urlKey)
+        assertEquals(result.urlKey, url.urlKey)
     }
 
     @Test
