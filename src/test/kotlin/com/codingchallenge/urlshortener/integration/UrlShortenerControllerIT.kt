@@ -16,6 +16,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import java.util.*
 
+/**
+ * Integration Tests for UrlShortenerController
+ *
+ * @author Aidar Aibekov
+ */
 @SpringBootTest(
     classes = [UrlshortenerApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT

@@ -14,6 +14,11 @@ import org.mockito.Mockito.*
 import org.springframework.boot.test.context.SpringBootTest
 import java.util.*
 
+/**
+ * Unit Tests for UrlShortenerController
+ *
+ * @author Aidar Aibekov
+ */
 @SpringBootTest
 class UrlShortenerControllerTest {
 

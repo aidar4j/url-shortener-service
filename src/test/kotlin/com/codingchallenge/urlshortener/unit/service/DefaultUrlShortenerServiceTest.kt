@@ -16,7 +16,11 @@ import java.time.ZonedDateTime
 import java.util.*
 import javax.persistence.EntityNotFoundException
 
-
+/**
+ * Unit Tests for DefaultUrlShortenerService
+ *
+ * @author Aidar Aibekov
+ */
 @SpringBootTest
 class DefaultUrlShortenerServiceTest {
 
