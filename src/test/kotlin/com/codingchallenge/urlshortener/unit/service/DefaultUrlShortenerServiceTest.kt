@@ -1,6 +1,6 @@
 package com.codingchallenge.urlshortener.unit.service
 
-import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.CreateShortUrlDto
 import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.repository.UrlRepository
 import com.codingchallenge.urlshortener.service.DefaultUrlShortenerService
@@ -31,7 +31,7 @@ class DefaultUrlShortenerServiceTest {
     private lateinit var urlRepository: UrlRepository
 
     @Test
-    fun shortenUrl_withValidDto_shouldReturnReadShortUrlDto() {
+    fun create_withValidDto_shouldReturnReadShortUrlDto() {
         val createShortUrldto = CreateShortUrlDto(url = "some long url")
 
         val url = Url(
@@ -44,7 +44,7 @@ class DefaultUrlShortenerServiceTest {
         `when`(urlRepository.findByOriginalUrl(createShortUrldto.url)).thenReturn(null)
         `when`(urlRepository.save(any())).thenReturn(url)
 
-        val result = defaultUrlShortenerService.shortenUrl(createShortUrldto)
+        val result = defaultUrlShortenerService.create(createShortUrldto)
         verify(urlRepository, times(1)).findByOriginalUrl(createShortUrldto.url)
         verify(urlRepository, times(1)).save(any())
         assertNotNull(result)
@@ -53,27 +53,52 @@ class DefaultUrlShortenerServiceTest {
     }
 
     @Test
-    fun shortenUrl_withValidDtoWithExistingUrl_shouldReturnReadShortUrlDto() {
-        val createShortUrldto = CreateShortUrlDto(url = "some long url")
+    fun create_withValidDtoWithExistingUrl_shouldReturnReadShortUrlDto() {
+        val createShortUrlDto = CreateShortUrlDto(url = "some long url")
 
         val url = Url(
             id = 1L,
-            originalUrl = createShortUrldto.url,
+            originalUrl = createShortUrlDto.url,
             urlKey = UUID.randomUUID().toString(),
             createdAt = ZonedDateTime.now()
         )
 
-        `when`(urlRepository.findByOriginalUrl(createShortUrldto.url)).thenReturn(url)
+        `when`(urlRepository.findByOriginalUrl(createShortUrlDto.url)).thenReturn(url)
 
-        val result = defaultUrlShortenerService.shortenUrl(createShortUrldto)
-        verify(urlRepository, times(1)).findByOriginalUrl(createShortUrldto.url)
+        val result = defaultUrlShortenerService.create(createShortUrlDto)
+        verify(urlRepository, times(1)).findByOriginalUrl(createShortUrlDto.url)
         assertNotNull(result)
         assertNotNull(result.urlKey)
         assertEquals(result.urlKey, url.urlKey)
     }
 
     @Test
-    fun getOriginalUrl_withValidUrlKey_shouldReturnReadOriginalUrlDto() {
+    fun getById_withValidUrlKey_shouldReturnReadUrlDto() {
+        val url = Url(
+            id = 1L,
+            originalUrl = "original url",
+            urlKey = "urlKey",
+            createdAt = ZonedDateTime.now()
+        )
+
+        `when`(urlRepository.findById(1L)).thenReturn(Optional.of(url))
+
+        val result = defaultUrlShortenerService.getById(1L)
+        verify(urlRepository, times(1)).findById(1L)
+        assertNotNull(result)
+        assertNotNull(result.originalUrl)
+        assertEquals(result.originalUrl, url.originalUrl)
+    }
+
+    @Test
+    fun getById_withId_shouldThrowENFE() {
+        `when`(urlRepository.findById(777L)).thenReturn(Optional.empty())
+
+        assertThrows<EntityNotFoundException> { defaultUrlShortenerService.getById(777L) }
+    }
+
+    @Test
+    fun getByUrlKey_withValidUrlKey_shouldReturnReadUrlDto() {
         val urlKey = UUID.randomUUID().toString()
 
         val url = Url(
@@ -85,7 +110,7 @@ class DefaultUrlShortenerServiceTest {
 
         `when`(urlRepository.findByUrlKey(urlKey)).thenReturn(url)
 
-        val result = defaultUrlShortenerService.getOriginalUrl(urlKey)
+        val result = defaultUrlShortenerService.getByUrlKey(urlKey)
         verify(urlRepository, times(1)).findByUrlKey(urlKey)
         assertNotNull(result)
         assertNotNull(result.originalUrl)
@@ -93,11 +118,11 @@ class DefaultUrlShortenerServiceTest {
     }
 
     @Test
-    fun getOriginalUrl_withNotValidUrlKey_shouldThrowENFE() {
+    fun getByUrlKey_withNotValidUrlKey_shouldThrowENFE() {
         val urlKey = "not existing url key"
 
         `when`(urlRepository.findByUrlKey(urlKey)).thenReturn(null)
 
-        assertThrows<EntityNotFoundException> { defaultUrlShortenerService.getOriginalUrl(urlKey) }
+        assertThrows<EntityNotFoundException> { defaultUrlShortenerService.getByUrlKey(urlKey) }
     }
 }

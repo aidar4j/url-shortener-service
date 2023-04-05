@@ -1,8 +1,8 @@
 package com.codingchallenge.urlshortener.controller
 
-import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
-import com.codingchallenge.urlshortener.domain.dto.ReadOriginalUrlDto
-import com.codingchallenge.urlshortener.domain.dto.ReadShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.CreateShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.ReadShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.ReadUrlDto
 import com.codingchallenge.urlshortener.service.UrlShortenerService
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -13,15 +13,19 @@ import javax.validation.Valid
  * @author Aidar Aibekov
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/urls")
 class UrlShortenerController(val urlShortenerService: UrlShortenerService) {
 
-    @PostMapping("/shorten")
+    @PostMapping
     @ResponseBody
-    fun shortenUrl(@Valid @RequestBody dto: CreateShortUrlDto): ReadShortUrlDto = urlShortenerService.shortenUrl(dto)
+    fun create(@Valid @RequestBody dto: CreateShortUrlDto): ReadShortUrlDto = urlShortenerService.create(dto)
 
-    @GetMapping("/original_url/{urlKey}")
+    @GetMapping("/{id}")
     @ResponseBody
-    fun getOriginalUrl(@PathVariable urlKey: String): ReadOriginalUrlDto = urlShortenerService.getOriginalUrl(urlKey)
+    fun getById(@PathVariable id: Long): ReadUrlDto = urlShortenerService.getById(id)
+
+    @GetMapping("/urlKey/{urlKey}")
+    @ResponseBody
+    fun getByUrlKey(@PathVariable urlKey: String): ReadUrlDto = urlShortenerService.getByUrlKey(urlKey)
 
 }

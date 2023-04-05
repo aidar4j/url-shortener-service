@@ -1,8 +1,8 @@
 package com.codingchallenge.urlshortener.service
 
-import com.codingchallenge.urlshortener.domain.dto.CreateShortUrlDto
-import com.codingchallenge.urlshortener.domain.dto.ReadOriginalUrlDto
-import com.codingchallenge.urlshortener.domain.dto.ReadShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.CreateShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.ReadShortUrlDto
+import com.codingchallenge.urlshortener.controller.dto.ReadUrlDto
 import com.codingchallenge.urlshortener.domain.entity.Url
 import com.codingchallenge.urlshortener.repository.UrlRepository
 import org.springframework.stereotype.Service
@@ -16,8 +16,9 @@ import javax.persistence.EntityNotFoundException
  * @author Aidar Aibekov
  */
 interface UrlShortenerService {
-    fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto
-    fun getOriginalUrl(urlKey: String): ReadOriginalUrlDto
+    fun create(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto
+    fun getById(id: Long): ReadUrlDto
+    fun getByUrlKey(urlKey: String): ReadUrlDto
 }
 
 /**
@@ -29,7 +30,7 @@ interface UrlShortenerService {
 class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortenerService {
 
     @Transactional
-    override fun shortenUrl(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
+    override fun create(createShortUrlDto: CreateShortUrlDto): ReadShortUrlDto {
         val existingUrlEntity: Url? = urlRepository.findByOriginalUrl(createShortUrlDto.url)
 
         val savedUrlEntity: Url = if (existingUrlEntity == null) {
@@ -48,11 +49,29 @@ class DefaultUrlShortenerService(val urlRepository: UrlRepository) : UrlShortene
     }
 
     @Transactional(readOnly = true)
-    override fun getOriginalUrl(urlKey: String): ReadOriginalUrlDto {
+    override fun getById(id: Long): ReadUrlDto {
+        val url = urlRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("URL Entity with id $id is not found!") }
+
+        return ReadUrlDto(
+            id = url.id!!,
+            originalUrl = url.originalUrl,
+            urlKey = url.urlKey,
+            createdAt = url.createdAt
+        )
+    }
+
+    @Transactional(readOnly = true)
+    override fun getByUrlKey(urlKey: String): ReadUrlDto {
         val url = urlRepository.findByUrlKey(urlKey)
             ?: throw EntityNotFoundException("URL Entity with urlKey $urlKey is not found!")
 
-        return ReadOriginalUrlDto(url.originalUrl)
+        return ReadUrlDto(
+            id = url.id!!,
+            originalUrl = url.originalUrl,
+            urlKey = url.urlKey,
+            createdAt = url.createdAt
+        )
     }
 
     private fun generateUrlKey(): String {

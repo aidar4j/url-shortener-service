@@ -1,4 +1,4 @@
-package com.codingchallenge.urlshortener.domain.dto
+package com.codingchallenge.urlshortener.controller.dto
 
 import javax.validation.constraints.NotBlank
 
